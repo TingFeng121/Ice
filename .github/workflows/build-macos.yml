@@ -34,13 +34,11 @@ jobs:
             -project Ice.xcodeproj \
             -scheme Ice \
             -configuration Release \
-            -destination 'generic/platform=macOS,arch=arm64' \
             -derivedDataPath ./DerivedData \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="-" \
             DEVELOPMENT_TEAM="" \
-            ENABLE_HARDENED_RUNTIME=NO \
-            ONLY_ACTIVE_ARCH=YES
+            ENABLE_HARDENED_RUNTIME=NO
 
       - name: Re-sign and package DMG
         run: |
