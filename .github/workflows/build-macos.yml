@@ -1,0 +1,60 @@
+name: Build Ice (Simplified Chinese)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode_15.4.app
+          xcodebuild -version
+
+      - name: Resolve Swift package dependencies
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project Ice.xcodeproj \
+            -scheme Ice \
+            -clonedSourcePackagesDirPath ./DerivedData/SourcePackages
+
+      - name: Build Release (ad-hoc signed)
+        run: |
+          set -euo pipefail
+          xcodebuild build \
+            -project Ice.xcodeproj \
+            -scheme Ice \
+            -configuration Release \
+            -destination 'generic/platform=macOS,arch=arm64' \
+            -derivedDataPath ./DerivedData \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="-" \
+            DEVELOPMENT_TEAM="" \
+            ENABLE_HARDENED_RUNTIME=NO \
+            ONLY_ACTIVE_ARCH=YES
+
+      - name: Re-sign and package DMG
+        run: |
+          set -euo pipefail
+          APP="./DerivedData/Build/Products/Release/Ice.app"
+          test -d "$APP"
+          codesign --force --deep --sign - --entitlements Ice/Ice.entitlements "$APP"
+          STAGING="$(mktemp -d)"
+          cp -R "$APP" "$STAGING/"
+          ln -s /Applications "$STAGING/Applications"
+          hdiutil create -volname "Ice" -srcfolder "$STAGING" -ov -format UDZO Ice-cn.dmg
+          rm -rf "$STAGING"
+          ls -lh Ice-cn.dmg
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ice-simplified-chinese
+          path: Ice-cn.dmg
+          if-no-files-found: error
