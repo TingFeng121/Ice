@@ -432,27 +432,28 @@ extension MenuBarItemManager {
 
         /// The message associated with this error.
         var message: String {
-            switch code {
+            let name = item.displayName
+            return switch code {
             case .couldNotComplete:
-                "Could not complete event operation for \"\(item.displayName)\""
+                String(format: String(localized: "Could not complete event operation for \"%@\""), name)
             case .eventCreationFailure:
-                "Failed to create event for \"\(item.displayName)\""
+                String(format: String(localized: "Failed to create event for \"%@\""), name)
             case .invalidAppState:
-                "Invalid app state for \"\(item.displayName)\""
+                String(format: String(localized: "Invalid app state for \"%@\""), name)
             case .invalidEventSource:
-                "Invalid event source for \"\(item.displayName)\""
+                String(format: String(localized: "Invalid event source for \"%@\""), name)
             case .invalidCursorLocation:
-                "Invalid cursor location for \"\(item.displayName)\""
+                String(format: String(localized: "Invalid cursor location for \"%@\""), name)
             case .invalidItem:
-                "\"\(item.displayName)\" is invalid"
+                String(format: String(localized: "\"%@\" is invalid"), name)
             case .notMovable:
-                "\"\(item.displayName)\" is not movable"
+                String(format: String(localized: "\"%@\" is not movable"), name)
             case .eventOperationTimeout:
-                "Event operation timed out for \"\(item.displayName)\""
+                String(format: String(localized: "Event operation timed out for \"%@\""), name)
             case .frameCheckTimeout:
-                "Frame check timed out for \"\(item.displayName)\""
+                String(format: String(localized: "Frame check timed out for \"%@\""), name)
             case .otherTimeout:
-                "Operation timed out for \"\(item.displayName)\""
+                String(format: String(localized: "Operation timed out for \"%@\""), name)
             }
         }
 
@@ -471,7 +472,7 @@ extension MenuBarItemManager {
 
         /// Suggestion for recovery from the error.
         var recoverySuggestion: String? {
-            "Please try again. If the error persists, please file a bug report."
+            String(localized: "Please try again. If the error persists, please file a bug report.")
         }
     }
 }
@@ -1350,7 +1351,10 @@ extension MenuBarItemManager {
 
         guard let targetItem = items.first else {
             let alert = NSAlert()
-            alert.messageText = "Not enough room to show \"\(item.displayName)\""
+            alert.messageText = String(
+                format: String(localized: "Not enough room to show \"%@\""),
+                item.displayName
+            )
             alert.runModal()
             return
         }
